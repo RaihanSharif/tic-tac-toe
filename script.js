@@ -189,3 +189,39 @@ Display controller module
     A function to start the game and take input for player names
         then add a new 
 */
+
+const DisplayController = (() => {
+    const gameBoard = document.getElementById("gameboard");
+    const restartBtn = document.getElementById("btn-restart");
+    const startBtn = document.getElementById("btn-start");
+    const plOneInput = document.getElementById("input-player-one");
+    const plTwoInput = document.getElementById("input-player-two");
+    const gameStatus = document.getElementById("status"); // change later
+    const plOneScore = document.getElementById("score-player-one");
+    const plTwoScore = document.getElementById("score-player-two");
+    const tieScore = document.getElementById("score-ties");
+
+    // this is not the way to do it...
+    // display should speak to GameController, not GameBoard
+    const renderBoard = () => {
+        gameBoard.innerHTML = ""; // clears the element
+        const board = GameBoard.getBoard();
+        board.array.forEach((symbol, index) => {
+            const cell = document.createElement("div");
+            cell.textContent = symbol;
+            // move listener to gameBoard element later
+            // try putting the index arg in the empty brackets see what happens
+            cell.addEventListener("click", () => cellClickHandler(index)); 
+            gameBoard.appendChild(cell);
+        });
+    }
+
+    // a fucntion to update the scores on the screen
+    // cell click handler
+    // game start function
+    // game reset function
+
+    // event listeners for all the buttons
+
+    // render the board
+});
