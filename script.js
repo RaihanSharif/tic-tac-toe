@@ -117,7 +117,6 @@ const GameController = (() => {
     // give player symbol choice later
     const playerOne = Player('', 'x');
     const playerTwo = Player('', 'o');
-    let isGameOver = false;
     let isPlayerOneTurn = true; // flips after every player turn
 
     // tracking score over several rounds
@@ -138,9 +137,50 @@ const GameController = (() => {
         playerTwo.setPlayerName(playerTwoName);
     }
 
-    
+    const playMove = (index) => {
+        // need to break here if gameOver?
+        let output = "";
+        const curentPlayer = getCurrentPlayer();
+        const playMove = GameBoard.updateBoard(index, curentPlayer.getPlayerSymbol());
 
-});
+        if(playMove) {
+            const winner = GameBoard.checkResult(index);
+            if (winner) {
+                if (isPlayerOneTurn) {
+                    playerOneScore++;
+                } else {
+                    playerTwoScore++;
+                }
+                output = `${curentPlayer.getPlayerName()} is the winner`;
+            } else if (GameBoard.getIsGameOver()) {
+                draws++;
+                output = "It's a draw!";
+            }
+            isPlayerOneTurn = !isPlayerOneTurn; // if move is played, change turn
+        } else {
+            // prompt for another move;
+        }
+        return output;
+    }
+
+    const resetGame = () => {
+        GameBoard.resetBoard();
+        isPlayerOneTurn = true;
+        playerOneScore = 0;
+        playerTwoScore = 0;
+        draws = 0;
+        // reset players later
+    }
+
+    const getScores = () =>  ({
+        playerOneScore,
+        playerTwoScore,
+        ties,
+    });
+
+    return {getCurrentPlayer, setPlayerNames, playMove, resetGame, getScores};
+
+})();
 
 /*
 Display controller module
