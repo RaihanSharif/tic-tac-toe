@@ -1,6 +1,8 @@
 const GameBoard = (() => {
     // the board array, not a 2d array, too complex.
     const board = ["", "", "", "", "", "", "", "", ""];
+    let moveCount = 0;
+    let isGameOver = false;
 
     const getBoard = () => board;
 
@@ -8,6 +10,7 @@ const GameBoard = (() => {
     const updateBoard = (index, symbol) => {
         if (board[index] === "")  {
             board[index] = symbol;
+            moveCount++;
             return true;
         }
         return false;
@@ -16,19 +19,81 @@ const GameBoard = (() => {
     const resetBoard = () => {
         // fill method replaces all elems in array, not a copy
         board.fill(""); 
+        moveCount = 0;
+        isGameOver = false;
     }
 
-    const checkResult = () => {
-        // win/draw/loss logic goes here.
 
-        // return 0 if playerOne wins, return 1 if
-        // player 2 wins, otherwise return -1
-        
+    // checks that a given set of indices 
+    // on the board all match a given symbol
+    function checkLine(symbolIn, checkerArr) {
+        return checkerArr.every((index) => {
+            board[index] == symbolIn;
+        });
     }
 
-    return {getBoard, updateBoard, resetBoard, checkResult};
+    // if the max possible number of moves has been played
+    // game is over
+    const getIsGameOver = () => isGameOver;
+
+    const checkResult = (playerIndex) => {
+        const leftDiag = [0, 4, 8];
+        const rightDiag = [2, 4, 6];
+        const firstCol = [0, 3, 6];
+        const secondCol = [1, 4, 7];
+        const thirdCol = [2, 5, 8];
+        const playerSymbol = board[playerIndex];
+
+        // Diags most likely to be a winning config
+        // so check those first
+        if (playerIndex % 2 === 0) {
+            if (checkLine(playerSymbol, leftDiag) ||
+            checkLine(playerSymbol, rightDiag)) {
+                return true;
+            }
+        }
+
+        // check col and row of the supplied cell
+        switch (playerIndex % 3) {
+            case 0:
+                if (checkLine(playerSymbol, firstCol)) {
+                    return true;
+                }
+                if (board[playerIndex + 1] === playerSymbol &&
+                board[playerIndex + 2] === playerSymbol) {
+                    return true;
+                }
+                break;
+            case 1:
+                if (checkLine(playerSymbol, secondCol)) {
+                    return true;
+                }
+                if (board[playerIndex - 1] === playerSymbol &&
+                board[playerIndex + 1] === playerSymbol) {
+                    return true;
+                }
+                break;
+            case 2:
+                if (checkLine(playerSymbol, thirdCol)) {
+                    return true;
+                }
+                if (board[playerIndex - 1] === playerSymbol &&
+                board[playerIndex - 2] === playerSymbol) {
+                    return true;
+                }
+                break;
+        }
+ 
+        // game is over.
+        // use this in controller to check for draw
+        if (moveCount === 9) {
+            isGameOver = true;
+        }
+        // no winner
+        return false;
+    }
+    return {getBoard, updateBoard, resetBoard, checkResult, getIsGameOver};
 }); 
-
 
 // a player factory function
 //   player symbol should be auto calculated ??
@@ -45,19 +110,6 @@ const Player = (nameIn, symbolIn) => {
 
 }
 
-/*
-a game controller module
-    has a game board
-    two players
-    something to track which player's turn it is
-    check winner/loser/draw
-    execute a player move
-    reset the game.
-    keep track of scores during the session
-
-    idea:
-        if player was x last round, they are o this round
-*/
 const GameController = (() => {
     // give player symbol choice later
     const playerOne = Player('', 'x');
