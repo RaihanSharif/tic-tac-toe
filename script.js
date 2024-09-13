@@ -1,134 +1,96 @@
-// Gameboard object
+const GameBoard = (() => {
+    // the board array, not a 2d array, too complex.
+    const board = ["", "", "", "", "", "", "", "", ""];
 
-// Player object
+    const getBoard = () => board;
 
-// GameRunner object
-
-// displayController ?
-
-const Game = (function GameBoard() {
-    // const board = new Array(3).fill("-").map(() => new Array(3).fill("-"));
-    const board = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
-    const playerOne = null;
-    const playerTwo = null;
-    let moves = 0; // if 9 moves played, and no winner found, game is declared a draw
-
-    console.log("Immediate invocation!!");
+    // symbol should be automatic?
+    const updateBoard = (index, symbol) => {
+        if (board[index] === "")  {
+            board[index] = symbol;
+            return true;
+        }
+        return false;
+    }
 
     const resetBoard = () => {
-        for (let arr in board) {
-            for (let cell in board[arr]) {
-                board[arr][cell] = "-";
-            }
-        }
+        // fill method replaces all elems in array, not a copy
+        board.fill(""); 
     }
 
     const checkResult = () => {
-        // return winner or draw;
+        // win/draw/loss logic goes here.
 
-        let row = 0;
-        let col = 0;
+        // return 0 if playerOne wins, return 1 if
+        // player 2 wins, otherwise return -1
         
-        const allEqual = arr => arr.every( v => v === arr[0] )
-
-        //check for matching column
-        while(col < 3) {
-            if (board[0][col] === board[1][col] && board[0][col] === board[2][col]) {
-                return `winner is ${board[0][col]}, at column: ${col}.`;
-            } else {
-                col++;
-            }
-        }
-
-        // check each row
-        for (let row in board) {
-            if (allEqual(board[row])) {
-                return `winner at row ${row}`;
-            }
-        }
-
-        if (board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
-            return `winner is diagonal top left to bottom right`;
-        }  
-        if (board[2][0] === board[1][1] && board[1][1] === board[0][2]) {
-            return `winner is diagonal bottom left to top right`;
-        }
-        if (moves >= 9) {
-            return `Game is a draw`;
-        }
-
-        return `no winner yet`;
-
-        /* 
-         Better solution:
-         if the input cell row == 0, or row == 2 or col == 0 or col == 2:
-            check, row, col, center and opposite cell (just flipping the row/col number gives you the opposite cell)
-
-         check if the row or col of the input cell creates an win
-
-        */
-
     }
 
-    // TODO: the symbol will be decided automatically later
-    const updateBoard = (row, col, symbol) => {
-        // array index change here
+    return {getBoard, updateBoard, resetBoard, checkResult};
+}); 
 
-        if (board[row][col] === 'X' || board[row][col] === 'O') {
-            alert("this space is already taken!");
-        } else {
-            board[row][col] = symbol;  // later this will depend on player/game logic
-            moves++;
-            displayController();
-        }
-    }
 
-    const getBoard = () => board;  // for debugging...
+// a player factory function
+//   player symbol should be auto calculated ??
+const Player = (nameIn, symbolIn) => {
+    let name = nameIn;
+    let symbol = symbolIn;
     
-    const displayController = () => {
-        console.log(board[0]);
-        console.log(board[1]);
-        console.log(board[2]);
-    }
-    // TODO: remove board later. This will make the board array private
-    return {board, resetBoard, updateBoard, getBoard, displayController, checkResult}; 
-})();
+    const setPlayerName = (nameIn) => name = nameIn;
+    const getPlayerName = () => name;
+    const setPlayerSymbol = (newSymbol) => symbol = newSymbol;
+    const getPlayerSymbol = () => symbol;
 
+    return {getPlayerName, setPlayerName, getPlayerSymbol, setPlayerSymbol};
 
-function createUser(name) {
-    //
 }
 
+/*
+a game controller module
+    has a game board
+    two players
+    something to track which player's turn it is
+    check winner/loser/draw
+    execute a player move
+    reset the game.
+    keep track of scores during the session
 
-// first col, should return:
-// // winner is x at col 0. Works
-// Game.updateBoard(0, 0);
-// Game.updateBoard(1, 0);
-// Game.updateBoard(2, 0);
-// console.log(Game.checkResult());
+    idea:
+        if player was x last round, they are o this round
+*/
+const GameController = (() => {
+    // give player symbol choice later
+    const playerOne = Player('', 'x');
+    const playerTwo = Player('', 'o');
+    let isGameOver = false;
+    let isPlayerOneTurn = true; // flips after every player turn
 
-// middle column
-// should return winner is x, at col 1. Works
-// Game.updateBoard(0, 1);
-// Game.updateBoard(1, 1);
-// Game.updateBoard(2, 1);
-// console.log(Game.checkResult());
+    // tracking score over several rounds
+    let playerOneWins = 0;
+    let playerTwoWins = 0;
+    let draws = 0;
 
-// last column
-// should return winner is x, at col 2. Works
-// Game.updateBoard(0, 2);
-// Game.updateBoard(1, 2);
-// Game.updateBoard(2, 2);
-// console.log(Game.checkResult());
+    const setPlayerNames = (playerOneName, playerTwoName) => {
+        playerOne.setPlayerName(playerOneName);
+        playerTwo.setPlayerName(playerTwoName);
+    }
 
-// works with all rows
-// Game.updateBoard(2, 0);
-// Game.updateBoard(2, 1);
-// Game.updateBoard(2, 2);
-// console.log(Game.checkResult());
+    const getCurretPlayer = () => {
+        if (isPlayerOneTurn) {
+            return playerOne;
+        } else {
+            return playerTwo;
+        }
+    }
 
-// diagnoal test. Works
-// Game.updateBoard(0, 2);
-// Game.updateBoard(1, 1);
-// Game.updateBoard(2, 0);
-// console.log(Game.checkResult());
+    
+
+});
+
+/*
+Display controller module
+    display the UI elements
+    update scores on the display
+    A function to start the game and take input for player names
+        then add a new 
+*/
