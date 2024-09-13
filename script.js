@@ -36,6 +36,9 @@ const GameBoard = (() => {
     // game is over
     const getIsGameOver = () => isGameOver;
 
+
+    // TODO: change this to return 1 if there is a winner
+    // 0 if not, and -1 if game is over
     const checkResult = (playerIndex) => {
         const leftDiag = [0, 4, 8];
         const rightDiag = [2, 4, 6];
@@ -43,13 +46,16 @@ const GameBoard = (() => {
         const secondCol = [1, 4, 7];
         const thirdCol = [2, 5, 8];
         const playerSymbol = board[playerIndex];
+        let hasWinner = false;
 
         // Diags most likely to be a winning config
         // so check those first
         if (playerIndex % 2 === 0) {
             if (checkLine(playerSymbol, leftDiag) ||
             checkLine(playerSymbol, rightDiag)) {
-                return true;
+                hasWinner = true;
+                isGameOver = true;
+                return hasWinner;
             }
         }
 
@@ -57,40 +63,37 @@ const GameBoard = (() => {
         switch (playerIndex % 3) {
             case 0:
                 if (checkLine(playerSymbol, firstCol)) {
-                    return true;
-                }
-                if (board[playerIndex + 1] === playerSymbol &&
+                    hasWinner = true;
+                } else if (board[playerIndex + 1] === playerSymbol &&
                 board[playerIndex + 2] === playerSymbol) {
-                    return true;
+                    hasWinner = true;
                 }
                 break;
             case 1:
                 if (checkLine(playerSymbol, secondCol)) {
-                    return true;
-                }
-                if (board[playerIndex - 1] === playerSymbol &&
+                    hasWinner = true;
+                } else if (board[playerIndex - 1] === playerSymbol &&
                 board[playerIndex + 1] === playerSymbol) {
-                    return true;
+                    hasWinner = true;
                 }
                 break;
             case 2:
                 if (checkLine(playerSymbol, thirdCol)) {
                     return true;
-                }
-                if (board[playerIndex - 1] === playerSymbol &&
+                } else if (board[playerIndex - 1] === playerSymbol &&
                 board[playerIndex - 2] === playerSymbol) {
-                    return true;
+                    hasWinner = true;
                 }
                 break;
         }
  
         // game is over.
         // use this in controller to check for draw
-        if (moveCount === 9) {
+        if (moveCount === 9 || hasWinner) {
             isGameOver = true;
         }
         // no winner
-        return false;
+        return hasWinner;
     }
     return {getBoard, updateBoard, resetBoard, checkResult, getIsGameOver};
 }); 
@@ -118,21 +121,21 @@ const GameController = (() => {
     let isPlayerOneTurn = true; // flips after every player turn
 
     // tracking score over several rounds
-    let playerOneWins = 0;
-    let playerTwoWins = 0;
+    let playerOneScore = 0;
+    let playerTwoScore = 0;
     let draws = 0;
 
-    const setPlayerNames = (playerOneName, playerTwoName) => {
-        playerOne.setPlayerName(playerOneName);
-        playerTwo.setPlayerName(playerTwoName);
-    }
-
-    const getCurretPlayer = () => {
+    const getCurrentPlayer = () => {
         if (isPlayerOneTurn) {
             return playerOne;
         } else {
             return playerTwo;
         }
+    }
+
+    const setPlayerNames = (playerOneName, playerTwoName) => {
+        playerOne.setPlayerName(playerOneName);
+        playerTwo.setPlayerName(playerTwoName);
     }
 
     
