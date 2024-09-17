@@ -194,12 +194,12 @@ const DisplayController = (() => {
     const gameBoard = document.getElementById("gameboard");
     const restartBtn = document.getElementById("btn-restart");
     const startBtn = document.getElementById("btn-start");
-    const plOneInput = document.getElementById("input-player-one");
-    const plTwoInput = document.getElementById("input-player-two");
-    const gameStatus = document.getElementById("status"); // change later
+    const plOneInput = document.getElementById("in-player-one");
+    const plTwoInput = document.getElementById("in-player-two");
+    const gameStatus = document.getElementById("game-status");
     const plOneScore = document.getElementById("score-player-one");
     const plTwoScore = document.getElementById("score-player-two");
-    const tieScore = document.getElementById("score-ties");
+    const tieScore = document.getElementById("score-draws");
 
     // this is not the way to do it...
     // display should speak to GameController, not GameBoard
