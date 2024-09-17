@@ -178,7 +178,7 @@ const GameController = (() => {
         playerTwoScore = 0;
         draws = 0;
         isGameOver = false;
-        // reset players later
+        setPlayerNames('Player 1', 'Player 2');
     };
 
     const nextRound = () => {
@@ -206,6 +206,7 @@ const DisplayController = (() => {
     const plOneScore = document.getElementById("score-player-one");
     const plTwoScore = document.getElementById("score-player-two");
     const drawScore = document.getElementById("score-draws");
+    const resetBtn = document.getElementById("btn-reset-game");
 
     // display should speak to GameController, not GameBoard?
     /* TODO: attach to the gameBoard element, and use event.target 
@@ -263,6 +264,14 @@ const DisplayController = (() => {
         anotherRoundBtn.classList.add("hidden");
     });
 
+    resetBtn.addEventListener("click", () => {
+        GameController.resetGame();
+        updateScores();
+        renderBoard();
+        gameStatus.classList.add("hidden");
+        anotherRoundBtn.classList.add("hidden");
+    });
+    
     renderBoard();
     return { renderBoard };
 })();
