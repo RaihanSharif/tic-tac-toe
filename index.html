@@ -11,21 +11,22 @@
     <h1>Play Tic-Tac-Toe</h1>
 
     <div id="player-info">
-        <label for="player1-name">Player 1 name:</label>
-        <input type="text" id="player1-name"  placeholder="Player 1" required>
-        <label for="player2-name">Player 2 name:</label>
-        <input type="text" name="" id="player2-name" placeholder="Player 2" required>
-        <button id="start-game">Start Game</button>
+        <label for="in-player-one">Player 1 name:</label>
+        <input type="text" id="in-player-one"  placeholder="Player 1" required>
+
+        <label for="in-player-two">Player 2 name:</label>
+        <input type="text" name="" id="in-player-two" placeholder="Player 2" required>
+        <button id="btn-start">Start Game</button>
     </div>
 
     <div id="gameboard"></div>
-    <button id="restart-game">Restart Game</button>
+    <button id="btn-restart">Restart Game</button>
 
     <div id="game-status" class="hidden"></div>
     <div id="scoreoard">
-        <p id="player1-score">Player 1 wins: 0</p>
-        <p id="player2-score">Player 2 wins: 0</p>
-        <p id="draws">Draws: 0</p>
+        <p id="score-player-one">Player 1 wins: 0</p>
+        <p id="score-player-two">Player 2 wins: 0</p>
+        <p id="score-draws">Draws: 0</p>
     </div>
 </body>
 </html>
