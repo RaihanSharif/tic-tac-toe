@@ -175,7 +175,7 @@ const GameController = (() => {
     const getScores = () =>  ({
         playerOneScore,
         playerTwoScore,
-        ties,
+        draws,
     });
 
     return {getCurrentPlayer, setPlayerNames, playMove, resetGame, getScores};
@@ -199,7 +199,7 @@ const DisplayController = (() => {
     const gameStatus = document.getElementById("game-status");
     const plOneScore = document.getElementById("score-player-one");
     const plTwoScore = document.getElementById("score-player-two");
-    const tieScore = document.getElementById("score-draws");
+    const drawScore = document.getElementById("score-draws");
 
     // this is not the way to do it...
     // display should speak to GameController, not GameBoard
@@ -216,7 +216,14 @@ const DisplayController = (() => {
         });
     }
 
-    // a fucntion to update the scores on the screen
+    // change to display scores?
+    const updateScores = () => {
+        const scores = GameController.getScores();
+        plOneScore.textContent = `Player 1 has ${scores.playerOneScore}`;
+        plTwoScore.textContent = `Player 2 has ${scores.playerTwoScore}`;
+        drawScore.textContent = `Draws: ${scores.draws}`;
+    }
+
     // cell click handler
     // game start function
     // game reset function
