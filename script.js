@@ -2,7 +2,6 @@ const GameBoard = (() => {
     // the board array, not a 2d array, too complex.
     const board = ["", "", "", "", "", "", "", "", ""];
     let moveCount = 0;
-    let isGameOver = false;
 
     const getBoard = () => board;
 
@@ -17,10 +16,8 @@ const GameBoard = (() => {
     };
 
     const resetBoard = () => {
-        // fill method replaces all elems in array, not a copy
         board.fill(""); 
         moveCount = 0;
-        isGameOver = false;
     };
 
 
@@ -36,37 +33,61 @@ const GameBoard = (() => {
 
     // if the max possible number of moves has been played
     // game is over
-    const getGameOver = () => isGameOver;
 
 
-    // TODO: change this to return 1 if there is a winner
-    // 0 if not, and -1 if game is over
+
+    // returns 1 if winner, 0 if not, -1 if draw
     const checkResult = (index) => {
         const leftDiag = [0, 4, 8];
         const rightDiag = [2, 4, 6];
         const firstCol = [0, 3, 6];
         const secondCol = [1, 4, 7];
         const thirdCol = [2, 5, 8];
-        let hasWinner = false;
         const playerSymbol = board[index];
 
         // check diags
-        console.log(`player symbol is`, playerSymbol, `index is `, index);
         if(index % 2 === 0) {
             if (checkLine(playerSymbol, leftDiag)) {
-                isGameOver = true;
-                console.log(`checkLine returned true`);
-                return true;
+                return 1;
             }
             if (checkLine(playerSymbol, rightDiag)) {
-                isGameOver = true;
-                console.log(`checkLine returned true`);
-                return true;
+                return 1;
             }
         }
 
+        switch (index % 3) {
+            case 0:
+                if (checkLine(playerSymbol, firstCol)) {
+                    return 1;
+                }
+                if (board[index + 1] === playerSymbol && board[index + 2] === playerSymbol) {
+                    return 1;
+                }
+                break;
+            case 1:
+                if (checkLine(playerSymbol, secondCol)) {
+                    return 1;
+                }
+                if (board[index + 1] === playerSymbol && board[index - 1] === playerSymbol) {
+                    return 1;
+                }
+                break;
+            case 2:
+                if (checkLine(playerSymbol, thirdCol)) {
+                    return 1;
+                }
+                if (board[index - 1] === playerSymbol && board[index - 2] === playerSymbol) {
+                    return 1;
+                }
+                break;
+        }
+
+        if(moveCount >= 9) {
+            return -1;
+        }
+        return 0;
     };
-    return {getBoard, updateBoard, resetBoard, checkResult, getGameOver, checkLine};
+    return {getBoard, updateBoard, resetBoard, checkResult};
 })(); 
 
 // a player factory function
@@ -89,6 +110,7 @@ const GameController = (() => {
     const playerOne = Player('Player 1', 'x');
     const playerTwo = Player('Player 2', 'o');
     let isPlayerOneTurn = true; // flips after every player turn
+    let isGameOver = false;
 
     // tracking score over several rounds
     let playerOneScore = 0;
@@ -110,38 +132,38 @@ const GameController = (() => {
 
     // returning empty str means no move was played
     const playMove = (index) => {
-        // need to break here if gameOver?
-        let output = "";
-        const curentPlayer = getCurrentPlayer();
-
-        // if the game is already over return an empty string
-        // TODO: shouldn't be necessary
-        // it is necessary because if the game is over
-        // and the user clicks a cell, we don't want to run
-        // all the other logic
-        if (GameBoard.getGameOver()) {
-            return output;
+        if (isGameOver) {
+            return;
         }
 
-        // only makes a move if game isn't already over
-        const makeMove = GameBoard.updateBoard(index, curentPlayer.getPlayerSymbol());
+        let output = "";
+        const currentPlayer = getCurrentPlayer();
 
-        if(makeMove) {
+        const move = GameBoard.updateBoard(index, currentPlayer.getPlayerSymbol());
+        if(move) {
             const winner = GameBoard.checkResult(index);
-            if (winner) {
-                if (isPlayerOneTurn) {
-                    playerOneScore++;
-                } else {
-                    playerTwoScore++;
-                }
-                output = `${curentPlayer.getPlayerName()} is the winner`;
-            } else if (GameBoard.getGameOver()) {
-                draws++;
-                output = "It's a draw!";
+
+            switch (winner) {
+                case 1:
+                    if(isPlayerOneTurn) {
+                        playerOneScore++;
+                    } else {
+                        playerTwoScore++;
+                    }
+                    isGameOver = true;
+                    output = `${currentPlayer.getPlayerName()} wins this round!`;
+                    break;
+                case 0:
+                    isPlayerOneTurn = !isPlayerOneTurn;
+                    break;
+                case -1:
+                    isGameOver = true;
+                    draws++;
+                    output = "it's a draw!";
+                    break;
+                default:
+                    break;
             }
-            isPlayerOneTurn = !isPlayerOneTurn; // if move is played, change turn
-        } else {
-            // prompt for another move;
         }
         return output;
     };
@@ -152,6 +174,7 @@ const GameController = (() => {
         playerOneScore = 0;
         playerTwoScore = 0;
         draws = 0;
+        isGameOver = false;
         // reset players later
     };
 
