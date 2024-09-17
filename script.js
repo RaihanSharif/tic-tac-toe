@@ -31,11 +31,6 @@ const GameBoard = (() => {
         return temp.every((elem) => elem === symbolIn);
     };
 
-    // if the max possible number of moves has been played
-    // game is over
-
-
-
     // returns 1 if winner, 0 if not, -1 if draw
     const checkResult = (index) => {
         const leftDiag = [0, 4, 8];
@@ -130,6 +125,15 @@ const GameController = (() => {
         playerTwo.setPlayerName(playerTwoName);
     };
 
+    // 0 for player 1 and 1 for player 2
+    const getPlayerName = (player) => {
+        if (player === 0) {
+            return playerOne.getPlayerName();
+        } else if (player === 1) {
+            return playerTwo.getPlayerName();
+        }
+    }
+
     // returning empty str means no move was played
     const playMove = (index) => {
         if (isGameOver) {
@@ -138,11 +142,10 @@ const GameController = (() => {
 
         let output = "";
         const currentPlayer = getCurrentPlayer();
-
         const move = GameBoard.updateBoard(index, currentPlayer.getPlayerSymbol());
+
         if(move) {
             const winner = GameBoard.checkResult(index);
-
             switch (winner) {
                 case 1:
                     if(isPlayerOneTurn) {
@@ -178,14 +181,18 @@ const GameController = (() => {
         // reset players later
     };
 
+    const nextRound = () => {
+        GameBoard.resetBoard();
+        isGameOver = false;
+    }
+
     const getScores = () =>  ({
         playerOneScore,
         playerTwoScore,
         draws,
     });
 
-    return {getCurrentPlayer, setPlayerNames, playMove, resetGame, getScores};
-
+    return {getCurrentPlayer, setPlayerNames, playMove, resetGame, getScores, nextRound, getPlayerName};
 })();
 
 
@@ -219,8 +226,8 @@ const DisplayController = (() => {
     // change to display scores?
     const updateScores = () => {
         const scores = GameController.getScores();
-        plOneScore.textContent = `Player 1 has ${scores.playerOneScore}`;
-        plTwoScore.textContent = `Player 2 has ${scores.playerTwoScore}`;
+        plOneScore.textContent = `${GameController.getPlayerName(0)} wins: ${scores.playerOneScore}`;
+        plTwoScore.textContent = `${GameController.getPlayerName(1)} wins: ${scores.playerTwoScore}`;
         drawScore.textContent = `Draws: ${scores.draws}`;
     };
 
@@ -249,7 +256,7 @@ const DisplayController = (() => {
     startBtn.addEventListener("click", startGame);
 
     restartBtn.addEventListener("click", () => {
-        GameController.resetGame();
+        GameController.nextRound();
         // TODO: more efficient to reset the text content of the cells?
         renderBoard(); 
         gameStatus.classList.add("hidden");
