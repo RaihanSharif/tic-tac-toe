@@ -198,7 +198,7 @@ const GameController = (() => {
 
 const DisplayController = (() => {
     const gameBoard = document.getElementById("gameboard");
-    const restartBtn = document.getElementById("btn-restart");
+    const anotherRoundBtn = document.getElementById("btn-another-round");
     const startBtn = document.getElementById("btn-start");
     const plOneInput = document.getElementById("in-player-one");
     const plTwoInput = document.getElementById("in-player-two");
@@ -237,7 +237,7 @@ const DisplayController = (() => {
         if (result != "") {
             gameStatus.textContent = result;
             gameStatus.classList.remove("hidden");
-            restartBtn.classList.remove("hidden");
+            anotherRoundBtn.classList.remove("hidden");
             updateScores();
         }
         renderBoard();
@@ -246,21 +246,21 @@ const DisplayController = (() => {
 
     const startGame = () => {
         // TODO: input validation
-        GameController.setPlayerNames(plOneInput.value, plTwoInput.value);
+        GameController.setPlayerNames((plOneInput.value || 'Player 1'), (plTwoInput.value || 'Player 2'));
         gameStatus.classList.add("hidden");
-        restartBtn.classList.add("hidden");
+        anotherRoundBtn.classList.add("hidden");
         renderBoard();
         updateScores();
     };
 
     startBtn.addEventListener("click", startGame);
 
-    restartBtn.addEventListener("click", () => {
+    anotherRoundBtn.addEventListener("click", () => {
         GameController.nextRound();
         // TODO: more efficient to reset the text content of the cells?
         renderBoard(); 
         gameStatus.classList.add("hidden");
-        restartBtn.classList.add("hidden");
+        anotherRoundBtn.classList.add("hidden");
     });
 
     renderBoard();
