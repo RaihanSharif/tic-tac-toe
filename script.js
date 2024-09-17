@@ -1,11 +1,9 @@
 const GameBoard = (() => {
-    // the board array, not a 2d array, too complex.
     const board = ["", "", "", "", "", "", "", "", ""];
     let moveCount = 0;
 
     const getBoard = () => board;
 
-    // symbol should be automatic?
     const updateBoard = (index, symbol) => {
         if (board[index] === "")  {
             board[index] = symbol;
@@ -85,15 +83,13 @@ const GameBoard = (() => {
     return {getBoard, updateBoard, resetBoard, checkResult};
 })(); 
 
-// a player factory function
-//   player symbol should be auto calculated ??
 const Player = (nameIn, symbolIn) => {
     let name = nameIn;
     let symbol = symbolIn;
     
     const setPlayerName = (nameIn) => name = nameIn;
     const getPlayerName = () => name;
-    const setPlayerSymbol = (newSymbol) => symbol = newSymbol;
+    const setPlayerSymbol = (symbolIn) => symbol = symbolIn;
     const getPlayerSymbol = () => symbol;
 
     return {getPlayerName, setPlayerName, getPlayerSymbol, setPlayerSymbol,};
@@ -101,11 +97,21 @@ const Player = (nameIn, symbolIn) => {
 };
 
 const GameController = (() => {
-    // give player symbol choice later
     const playerOne = Player('Player 1', 'x');
     const playerTwo = Player('Player 2', 'o');
     let isPlayerOneTurn = true; // flips after every player turn
     let isGameOver = false;
+    let round = 0; 
+
+    // this ensures each player gets a chance to be the first to play a move
+    // since first move is a big advantage.
+    function setFirstPlayer() {
+        if (round % 2 === 0) {
+            isPlayerOneTurn = true;
+        } else {
+            isPlayerOneTurn = false;
+        }
+    }
 
     // tracking score over several rounds
     let playerOneScore = 0;
@@ -125,7 +131,7 @@ const GameController = (() => {
         playerTwo.setPlayerName(playerTwoName);
     };
 
-    // 0 for player 1 and 1 for player 2
+    // input 0 for player 1, and 1 for player 2
     const getPlayerName = (player) => {
         if (player === 0) {
             return playerOne.getPlayerName();
@@ -145,8 +151,8 @@ const GameController = (() => {
         const move = GameBoard.updateBoard(index, currentPlayer.getPlayerSymbol());
 
         if(move) {
-            const winner = GameBoard.checkResult(index);
-            switch (winner) {
+            const result = GameBoard.checkResult(index);
+            switch (result) {
                 case 1:
                     if(isPlayerOneTurn) {
                         playerOneScore++;
@@ -179,11 +185,15 @@ const GameController = (() => {
         draws = 0;
         isGameOver = false;
         setPlayerNames('Player 1', 'Player 2');
+        round = 0;
     };
 
     const nextRound = () => {
         GameBoard.resetBoard();
+        round++;
+        setFirstPlayer();
         isGameOver = false;
+
     }
 
     const getScores = () =>  ({
@@ -207,24 +217,21 @@ const DisplayController = (() => {
     const plTwoScore = document.getElementById("score-player-two");
     const drawScore = document.getElementById("score-draws");
     const resetBtn = document.getElementById("btn-reset-game");
-
-    // display should speak to GameController, not GameBoard?
-    /* TODO: attach to the gameBoard element, and use event.target 
-       to decide which cell is clicked instead of 9 listeners. */
+    const currentPlayer = document.getElementById("current-player");
+    
     const renderBoard = () => {
-        gameBoard.innerHTML = ""; // clears the element
+        gameBoard.innerHTML = ""; 
         const board = GameBoard.getBoard();
         board.forEach((symbol, index) => {
             const cell = document.createElement("div");
             cell.textContent = symbol;
-            // move listener to gameBoard element later
-            // try putting the index arg in the empty brackets see what happens
+            // TODO: move listener to gameBoard element later
             cell.addEventListener("click", () => cellClickHandler(index)); 
             gameBoard.appendChild(cell);
         });
     };
 
-    // change to display scores?
+
     const updateScores = () => {
         const scores = GameController.getScores();
         plOneScore.textContent = `${GameController.getPlayerName(0)} wins: ${scores.playerOneScore}`;
@@ -235,7 +242,8 @@ const DisplayController = (() => {
     // cell click handler
     const cellClickHandler = (index) => {
         const result = GameController.playMove(index);
-        if (result != "") {
+        currentPlayer.textContent = `Current player: ${GameController.getCurrentPlayer().getPlayerName()}`;
+        if (result) {
             gameStatus.textContent = result;
             gameStatus.classList.remove("hidden");
             anotherRoundBtn.classList.remove("hidden");
@@ -246,19 +254,18 @@ const DisplayController = (() => {
 
 
     const startGame = () => {
-        // TODO: input validation
         GameController.setPlayerNames((plOneInput.value || 'Player 1'), (plTwoInput.value || 'Player 2'));
         gameStatus.classList.add("hidden");
         anotherRoundBtn.classList.add("hidden");
         renderBoard();
         updateScores();
+        currentPlayer.textContent = `current player is: ${GameController.getCurrentPlayer().getPlayerName()}`;
     };
 
     startBtn.addEventListener("click", startGame);
 
     anotherRoundBtn.addEventListener("click", () => {
         GameController.nextRound();
-        // TODO: more efficient to reset the text content of the cells?
         renderBoard(); 
         gameStatus.classList.add("hidden");
         anotherRoundBtn.classList.add("hidden");
@@ -273,5 +280,5 @@ const DisplayController = (() => {
     });
     
     renderBoard();
-    return { renderBoard };
+    // return { renderBoard };
 })();
