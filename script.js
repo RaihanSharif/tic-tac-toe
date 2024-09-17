@@ -115,8 +115,8 @@ const Player = (nameIn, symbolIn) => {
 
 const GameController = (() => {
     // give player symbol choice later
-    const playerOne = Player('', 'x');
-    const playerTwo = Player('', 'o');
+    const playerOne = Player('Player 1', 'x');
+    const playerTwo = Player('Player 2', 'o');
     let isPlayerOneTurn = true; // flips after every player turn
 
     // tracking score over several rounds
@@ -246,8 +246,15 @@ const DisplayController = (() => {
         renderBoard();
     }
 
-    // game start function
-    // game reset function
+    
+    const startGame = () => {
+        // TODO: input validation
+        GameController.setPlayerNames(plOneInput.value, plTwoInput.value);
+        gameStatus.classList.add("hidden");
+        restartBtn.classList.add("hidden");
+        renderBoard();
+        updateScores();
+    }
 
     // event listeners for all the buttons
 
