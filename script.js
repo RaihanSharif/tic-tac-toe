@@ -14,14 +14,14 @@ const GameBoard = (() => {
             return true;
         }
         return false;
-    }
+    };
 
     const resetBoard = () => {
         // fill method replaces all elems in array, not a copy
         board.fill(""); 
         moveCount = 0;
         isGameOver = false;
-    }
+    };
 
 
     // checks that a given set of indices 
@@ -30,11 +30,11 @@ const GameBoard = (() => {
         return checkerArr.every((index) => {
             board[index] == symbolIn;
         });
-    }
+    };
 
     // if the max possible number of moves has been played
     // game is over
-    const getIsGameOver = () => isGameOver;
+    const getGameOver = () => isGameOver;
 
 
     // TODO: change this to return 1 if there is a winner
@@ -94,9 +94,9 @@ const GameBoard = (() => {
         }
         // no winner
         return hasWinner;
-    }
-    return {getBoard, updateBoard, resetBoard, checkResult, getIsGameOver};
-}); 
+    };
+    return {getBoard, updateBoard, resetBoard, checkResult, getGameOver};
+})(); 
 
 // a player factory function
 //   player symbol should be auto calculated ??
@@ -111,7 +111,7 @@ const Player = (nameIn, symbolIn) => {
 
     return {getPlayerName, setPlayerName, getPlayerSymbol, setPlayerSymbol};
 
-}
+};
 
 const GameController = (() => {
     // give player symbol choice later
@@ -130,12 +130,12 @@ const GameController = (() => {
         } else {
             return playerTwo;
         }
-    }
+    };
 
     const setPlayerNames = (playerOneName, playerTwoName) => {
         playerOne.setPlayerName(playerOneName);
         playerTwo.setPlayerName(playerTwoName);
-    }
+    };
 
     // returning empty str means no move was played
     const playMove = (index) => {
@@ -148,7 +148,7 @@ const GameController = (() => {
         // it is necessary because if the game is over
         // and the user clicks a cell, we don't want to run
         // all the other logic
-        if (GameBoard.isGameOver()) {
+        if (GameBoard.getGameOver()) {
             return output;
         }
 
@@ -164,7 +164,7 @@ const GameController = (() => {
                     playerTwoScore++;
                 }
                 output = `${curentPlayer.getPlayerName()} is the winner`;
-            } else if (GameBoard.getIsGameOver()) {
+            } else if (GameBoard.getGameOver()) {
                 draws++;
                 output = "It's a draw!";
             }
@@ -173,7 +173,7 @@ const GameController = (() => {
             // prompt for another move;
         }
         return output;
-    }
+    };
 
     const resetGame = () => {
         GameBoard.resetBoard();
@@ -182,7 +182,7 @@ const GameController = (() => {
         playerTwoScore = 0;
         draws = 0;
         // reset players later
-    }
+    };
 
     const getScores = () =>  ({
         playerOneScore,
@@ -212,15 +212,16 @@ const DisplayController = (() => {
     const renderBoard = () => {
         gameBoard.innerHTML = ""; // clears the element
         const board = GameBoard.getBoard();
-        board.array.forEach((symbol, index) => {
+        board.forEach((symbol, index) => {
             const cell = document.createElement("div");
             cell.textContent = symbol;
+            console.log(cell);
             // move listener to gameBoard element later
             // try putting the index arg in the empty brackets see what happens
             cell.addEventListener("click", () => cellClickHandler(index)); 
             gameBoard.appendChild(cell);
         });
-    }
+    };
 
     // change to display scores?
     const updateScores = () => {
@@ -228,7 +229,7 @@ const DisplayController = (() => {
         plOneScore.textContent = `Player 1 has ${scores.playerOneScore}`;
         plTwoScore.textContent = `Player 2 has ${scores.playerTwoScore}`;
         drawScore.textContent = `Draws: ${scores.draws}`;
-    }
+    };
 
     // cell click handler
     const cellClickHandler = (index) => {
@@ -240,7 +241,7 @@ const DisplayController = (() => {
             updateScores();
         }
         renderBoard();
-    }
+    };
 
 
     const startGame = () => {
@@ -250,7 +251,7 @@ const DisplayController = (() => {
         restartBtn.classList.add("hidden");
         renderBoard();
         updateScores();
-    }
+    };
 
     startBtn.addEventListener("click", startGame);
 
@@ -264,4 +265,4 @@ const DisplayController = (() => {
 
     renderBoard();
     return { renderBoard };
-});
+})();
