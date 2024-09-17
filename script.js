@@ -27,9 +27,11 @@ const GameBoard = (() => {
     // checks that a given set of indices 
     // on the board all match a given symbol
     function checkLine(symbolIn, checkerArr) {
-        return checkerArr.every((index) => {
-            board[index] == symbolIn;
+        const temp = [];
+        checkerArr.forEach((index) => {
+            temp.push(board[index]);
         });
+        return temp.every((elem) => elem === symbolIn);
     };
 
     // if the max possible number of moves has been played
@@ -39,63 +41,32 @@ const GameBoard = (() => {
 
     // TODO: change this to return 1 if there is a winner
     // 0 if not, and -1 if game is over
-    const checkResult = (playerIndex) => {
+    const checkResult = (index) => {
         const leftDiag = [0, 4, 8];
         const rightDiag = [2, 4, 6];
         const firstCol = [0, 3, 6];
         const secondCol = [1, 4, 7];
         const thirdCol = [2, 5, 8];
-        const playerSymbol = board[playerIndex];
         let hasWinner = false;
+        const playerSymbol = board[index];
 
-        // Diags most likely to be a winning config
-        // so check those first
-        if (playerIndex % 2 === 0) {
-            if (checkLine(playerSymbol, leftDiag) ||
-            checkLine(playerSymbol, rightDiag)) {
-                hasWinner = true;
+        // check diags
+        console.log(`player symbol is`, playerSymbol, `index is `, index);
+        if(index % 2 === 0) {
+            if (checkLine(playerSymbol, leftDiag)) {
                 isGameOver = true;
-                return hasWinner;
+                console.log(`checkLine returned true`);
+                return true;
+            }
+            if (checkLine(playerSymbol, rightDiag)) {
+                isGameOver = true;
+                console.log(`checkLine returned true`);
+                return true;
             }
         }
 
-        // check col and row of the supplied cell
-        switch (playerIndex % 3) {
-            case 0:
-                if (checkLine(playerSymbol, firstCol)) {
-                    hasWinner = true;
-                } else if (board[playerIndex + 1] === playerSymbol &&
-                board[playerIndex + 2] === playerSymbol) {
-                    hasWinner = true;
-                }
-                break;
-            case 1:
-                if (checkLine(playerSymbol, secondCol)) {
-                    hasWinner = true;
-                } else if (board[playerIndex - 1] === playerSymbol &&
-                board[playerIndex + 1] === playerSymbol) {
-                    hasWinner = true;
-                }
-                break;
-            case 2:
-                if (checkLine(playerSymbol, thirdCol)) {
-                    return true;
-                } else if (board[playerIndex - 1] === playerSymbol &&
-                board[playerIndex - 2] === playerSymbol) {
-                    hasWinner = true;
-                }
-                break;
-        }
- 
-        // game is over.
-        // use this in controller to check for draw
-        if (moveCount === 9 || hasWinner) {
-            isGameOver = true;
-        }
-        // no winner
-        return hasWinner;
     };
-    return {getBoard, updateBoard, resetBoard, checkResult, getGameOver};
+    return {getBoard, updateBoard, resetBoard, checkResult, getGameOver, checkLine};
 })(); 
 
 // a player factory function
@@ -109,7 +80,7 @@ const Player = (nameIn, symbolIn) => {
     const setPlayerSymbol = (newSymbol) => symbol = newSymbol;
     const getPlayerSymbol = () => symbol;
 
-    return {getPlayerName, setPlayerName, getPlayerSymbol, setPlayerSymbol};
+    return {getPlayerName, setPlayerName, getPlayerSymbol, setPlayerSymbol,};
 
 };
 
@@ -215,7 +186,6 @@ const DisplayController = (() => {
         board.forEach((symbol, index) => {
             const cell = document.createElement("div");
             cell.textContent = symbol;
-            console.log(cell);
             // move listener to gameBoard element later
             // try putting the index arg in the empty brackets see what happens
             cell.addEventListener("click", () => cellClickHandler(index)); 
