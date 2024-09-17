@@ -137,13 +137,22 @@ const GameController = (() => {
         playerTwo.setPlayerName(playerTwoName);
     }
 
+    // returning empty str means no move was played
     const playMove = (index) => {
         // need to break here if gameOver?
         let output = "";
         const curentPlayer = getCurrentPlayer();
-        const playMove = GameBoard.updateBoard(index, curentPlayer.getPlayerSymbol());
 
-        if(playMove) {
+        // if the game is already over return an empty string
+        // TODO: shouldn't be necessary
+        if (GameBoard.isGameOver()) {
+            return output;
+        }
+
+        // only makes a move if game isn't already over
+        const makeMove = GameBoard.updateBoard(index, curentPlayer.getPlayerSymbol());
+
+        if(makeMove) {
             const winner = GameBoard.checkResult(index);
             if (winner) {
                 if (isPlayerOneTurn) {
@@ -201,8 +210,9 @@ const DisplayController = (() => {
     const plTwoScore = document.getElementById("score-player-two");
     const drawScore = document.getElementById("score-draws");
 
-    // this is not the way to do it...
-    // display should speak to GameController, not GameBoard
+    // display should speak to GameController, not GameBoard?
+    /* TODO: attach to the gameBoard element, and use event.target 
+       to decide which cell is clicked instead of 9 listeners. */
     const renderBoard = () => {
         gameBoard.innerHTML = ""; // clears the element
         const board = GameBoard.getBoard();
@@ -225,6 +235,17 @@ const DisplayController = (() => {
     }
 
     // cell click handler
+    const cellClickHandler = (index) => {
+        const result = GameController.playMove(index);
+        if (result != "") {
+            gameStatus.textContent = result;
+            gameStatus.classList.remove("hidden");
+            restartBtn.classList.remove("hidden");
+            updateScores();
+        }
+        renderBoard();
+    }
+
     // game start function
     // game reset function
 
