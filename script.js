@@ -145,6 +145,9 @@ const GameController = (() => {
 
         // if the game is already over return an empty string
         // TODO: shouldn't be necessary
+        // it is necessary because if the game is over
+        // and the user clicks a cell, we don't want to run
+        // all the other logic
         if (GameBoard.isGameOver()) {
             return output;
         }
@@ -191,13 +194,6 @@ const GameController = (() => {
 
 })();
 
-/*
-Display controller module
-    display the UI elements
-    update scores on the display
-    A function to start the game and take input for player names
-        then add a new 
-*/
 
 const DisplayController = (() => {
     const gameBoard = document.getElementById("gameboard");
@@ -246,7 +242,7 @@ const DisplayController = (() => {
         renderBoard();
     }
 
-    
+
     const startGame = () => {
         // TODO: input validation
         GameController.setPlayerNames(plOneInput.value, plTwoInput.value);
@@ -256,7 +252,16 @@ const DisplayController = (() => {
         updateScores();
     }
 
-    // event listeners for all the buttons
+    startBtn.addEventListener("click", startGame);
 
-    // render the board
+    restartBtn.addEventListener("click", () => {
+        GameController.resetGame();
+        // TODO: more efficient to reset the text content of the cells?
+        renderBoard(); 
+        gameStatus.classList.add("hidden");
+        restartBtn.classList.add("hidden");
+    });
+
+    renderBoard();
+    return { renderBoard };
 });
